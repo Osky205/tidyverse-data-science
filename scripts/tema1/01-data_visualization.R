@@ -1,19 +1,34 @@
-#Data Visualization - 11 de Mayo de 2018
+#########################################################################################################
+# Clase 19: Nuestro primer ggplot
+
+
+
+#Cargamos la libreria tidyverse
 library(tidyverse)
 
-#tidyverse 1.2.1 ──
-#✔ ggplot2 2.2.1     ✔ purrr   0.2.4
-#✔ tibble  1.4.2     ✔ dplyr   0.7.4
-#✔ tidyr   0.8.0     ✔ stringr 1.3.1
-#✔ readr   1.1.1     ✔ forcats 0.3.0
 
-#Los coches con motor más grande consumen más combustible 
-#que los coches con motor más pequeño.
+# Registramos las versiones de la libreria utilizada.
+# Esto, nos permite ante cualquier cambio de versión que No funcione, volver a la primera
+
+# v ggplot2 3.3.3     v purrr   0.3.4
+# v tibble  3.1.1     v dplyr   1.0.6
+# v tidyr   1.1.3     v stringr 1.4.0
+# v readr   1.4.0     v forcats 0.5.1
+
+
+# Estas son las funciones que, invocadas sin el Nombre del paquete, estarán en conflicto 
+
+# x dplyr::filter() masks stats::filter()
+# x dplyr::lag()    masks stats::lag()
+
+#Preguntas:
+#Los coches con motor más grande consumen más combustible que los coches con motor más pequeños.
 #La relación consumo / tamaño es lineal? Es no lineal? Es exponencial?
 #Es positiva? Es negativa?
 
 View(mpg)
 ?mpg #help(mpg)
+
 # displ: tamaño del motor del coche en litros
 # hwy: número de millas recorridas en autopista por galón de combustible (3.785411784 litros)
 
@@ -25,82 +40,136 @@ mpg %>% ggplot()
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy))
 
-#PLANTILLA PARA HACER UNA REPRESENTACIÓN GRÁFICA CON GGPLOT
-#ggplot(data = <DATA_FRAME>) +
-#  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
 
-ggplot(data = mpg) +
-  geom_point(mapping = aes(x = class, y = drv))
+# ggplot(data = dataframe) +
+#   geom_point(mapping = aes(x = variable1, y = variable2))  
 
 
+# geom_point: grafico de nube de puntos
+# maapping: describe que variable se mapea en cada eje 
+# aes: describe la estetica
 
-#Color de los puntos
+
+
+#########################################################################################################
+# Clase 20: Combinando los mapping esteticos del grafico.
+
+
+
+# Color de los puntos: color = f(class)
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, color = class))
 
-#Tamaño de los puntos (conviene que sea numérico)
+
+
+# Tamaño de los puntos: size = f(class) (conviene que sea numérico)
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, size = class))
 
-#Transparencia de los puntos
+
+
+# Transparencia de los puntos: alpha = f(class)
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
 
-#Forma de los puntos (solo permite 6 formas a la vez)
+
+
+
+# Forma de los puntos: shape f(class) (solo permite representar 6 formas de puntos a la vez)
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, shape = class))
 
-#Elección manual de estéticas
+
+
+# Elección manual de estéticas global (por fuera del mapping)
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy), color = "red")
+
 # color = nombre del color en formato string
 # size = tamaño del punto en mm
-# shape = forma del punto con números desde el 0 al 25
-# 0 - 14: son formas huecas y por tanto solo se le puede cambiar el color
-# 15- 20: son formas rellenas de color, por tanto se le puede cambiar el color
-# 21 - 25: son formas con borde y relleno, y se les puede cambiar el color (borde) y el fill (relleno)
+# shape = forma del punto según números desde el 0 al 25 (googlear: ggplot2 Quick Reference Shape)
+  
+  # 0 - 14: son formas huecas y por tanto solo se le puede cambiar el color
+  # 15- 20: son formas rellenas de color, por tanto se le puede cambiar el color
+  # 21 - 25: son formas con borde y relleno, y se les puede cambiar el color (borde) y el fill (relleno)
 
-d=data.frame(p=c(0:25))
+
+# Google -> ggplot2 Quick Reference Shape: codigo con los numeros de los distintos shape.
+d=data.frame(p=c(0:25,32:127))
 ggplot() +
   scale_y_continuous(name="") +
   scale_x_continuous(name="") +
   scale_shape_identity() +
-  geom_point(data=d, mapping=aes(x=p%%16, y=p%/%16, shape=p), size=5, fill="yellow") +
+  geom_point(data=d, mapping=aes(x=p%%16, y=p%/%16, shape=p), size=5, fill="red") +
   geom_text(data=d, mapping=aes(x=p%%16, y=p%/%16+0.25, label=p), size=3)
 
-
-
+# Ejemplo 1: de aplicación de "size"
 ggplot(data = mpg) + 
-  geom_point(mapping = aes(x = displ, y = hwy), 
-             shape = 23, size = 10, color = "red", 
-             fill = 'yellow')
+  geom_point(mapping = aes(x = displ, y = hwy), shape=23, color="red",fill="yellow", size=3)
 
+# Ejemplo 2: En este ejemplo se observa la alineación de R luego de las comas (,) y parentesis ()
 ggplot(data = mpg) + 
-  geom_point(mapping = aes(x=displ, y = hwy, color = displ<5))
+  geom_point(mapping = aes(x = displ,
+                           y = hwy
+                           ),
+             shape = 23,
+             size = 10, color = "red", 
+             fill = 'yellow'
+             )
+
+#########################################################################################################
+# Clase 21: Problemas comunes cuando empezamos a usar R. 
+# Algunas anotaciones menores (de mucho texto..!) en el cuaderno de notas
+
+#########################################################################################################
+# Clase 22: Los facets de ggplot 
+
+# Los facets permiten hacer diferentes subplots (graficos).
+# Se utiizan con variables categoricas (numero finito de valores)
 
 
-##FACETS
-# facet_wrap(~<FORMULA_VARIABLE>): la variable debe ser discreta
+# facet_wrap(~ <FORMULA_VARIABLE>): Permite hacer un subplot (grafico) por cada valor de la variable
+#                                   La variable debe ser discreta
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy)) +
-  facet_wrap(~class, nrow = 3)
+  facet_wrap(~class, nrow = 2) # nrow: cantidad de filas con gráfiquitos.!
+
+
 
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy)) +
   facet_wrap(~displ, nrow = 3)
 
-# facet_grid(<FORMULA_VARIABLE1>~<FORMULA_VARIABLE2>)
+
+
+# facet_grid(<FORMULA_VARIABLE1>~<FORMULA_VARIABLE2>): Permite cruzar dos variables entre si.
+#                                                      Un grafico por cada combinacion de las variables 
 ggplot(data = mpg) +
   geom_point(mapping = aes(x=displ, y = hwy)) +
   facet_grid(drv~cyl)
 
-ggplot(data = mpg) +
-  geom_point(mapping = aes(x=displ, y = hwy)) +
-  facet_grid(.~cyl)
+
 
 ggplot(data = mpg) +
   geom_point(mapping = aes(x=displ, y = hwy)) +
-  facet_grid(drv~.)
+  facet_grid(.~cyl) # Facets por "cyl" y graficos orientados en columnas (.~cyl).
+
+
+
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x=displ, y = hwy)) +
+  facet_grid(cyl~.) # Facets por "cyl" y graficos orientados en filas (cyl~.).
+
+
+
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x=displ, y = hwy)) +
+  facet_grid(drv~.) # Facetes por "drv" y graficos orientados en filas (drv~.)
+
+#########################################################################################################
+# Clase 23: EMPEZAR DESDE AQUI..!!!!!!!!!!!!!!
+
+
 
 #Diferentes geometrías
 ggplot(data = mpg) + 
